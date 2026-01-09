@@ -7,8 +7,6 @@ venv/
 __pycache__/
 *.pyc
 
-# ML models
-*.pkl
 
 # Environment variables
 .env

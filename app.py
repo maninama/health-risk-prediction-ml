@@ -11,7 +11,10 @@ app = Flask(__name__, template_folder="templates")
 CSV_PATH = "dataset/health_data.csv"
 
 # ---------- Load ML model ----------
-with open("model/model.pkl", "rb") as file:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
+
+with open(MODEL_PATH, "rb") as file:
     model = pickle.load(file)
 
 
