@@ -1,0 +1,17 @@
+# Virtual environment
+health/
+ml_env/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# ML models
+*.pkl
+
+# Environment variables
+.env
+
+# Logs
+*.log

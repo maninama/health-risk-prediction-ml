@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPulse - Input Form</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+        }
+
+        body{
+            background:linear-gradient(135deg,#e0f7fa 0%,#80deea 100%);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
+
+        .container{
+            background:rgba(255,255,255,0.85);
+            backdrop-filter:blur(15px);
+            padding:30px;
+            border-radius:24px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.1);
+            width:100%;
+            max-width:450px;
+            border:1px solid rgba(255,255,255,0.4);
+            animation:fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(25px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+
+        .header{
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        .header h2{
+            color:#00796b;
+            font-size:1.8rem;
+            margin-bottom:6px;
+        }
+
+        .header p{
+            color:#546e7a;
+            font-size:0.9rem;
+        }
+
+        .input-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:20px;
+        }
+
+        .input-group{
+            display:flex;
+            flex-direction:column;
+        }
+
+        label{
+            font-size:0.85rem;
+            color:#37474f;
+            margin-bottom:6px;
+            font-weight:600;
+        }
+
+        input,select{
+            padding:12px 15px;
+            border:1.5px solid #cfd8dc;
+            border-radius:12px;
+            outline:none;
+            transition:all 0.25s ease;
+            font-size:0.95rem;
+        }
+
+        input:focus,select:focus{
+            border-color:#00bfa5;
+            box-shadow:0 0 10px rgba(0,191,165,0.2);
+        }
+
+        .submit-btn{
+            width:100%;
+            margin-top:28px;
+            padding:15px;
+            border:none;
+            border-radius:14px;
+            background:#00bfa5;
+            color:white;
+            font-size:1.05rem;
+            font-weight:700;
+            cursor:pointer;
+            transition:all 0.25s ease;
+            box-shadow:0 4px 15px rgba(0,191,165,0.3);
+        }
+
+        .submit-btn:hover{
+            background:#00897b;
+            transform:translateY(-2px);
+            box-shadow:0 6px 20px rgba(0,191,165,0.4);
+        }
+
+        @media(max-width:400px){
+            .input-grid{
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>🩺 Health Tracker</h2>
+        <p>Apna basic health data enter karein</p>
+    </div>
+
+    <!-- 🔥 Flask ready form -->
+    <form action="/predict" method="post">
+
+        <div class="input-grid">
+
+            <div class="input-group">
+                <label>Age</label>
+                <input type="number" name="age" min="1" max="120" required>
+            </div>
+
+            <div class="input-group">
+                <label>Gender</label>
+                <select name="gender" required>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Fever</label>
+                <select name="fever" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Blood Pressure (Systolic)</label>
+                <input type="number" name="bp" min="80" max="200" required>
+            </div>
+
+            <div class="input-group">
+                <label>Sugar (mg/dL)</label>
+                <input type="number" name="sugar" min="50" max="300" required>
+            </div>
+
+            <div class="input-group">
+                <label>Oxygen (%)</label>
+                <input type="number" name="oxygen" min="70" max="100" required>
+            </div>
+
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Save Health Data
+        </button>
+
+    </form>
+</div>
+
+</body>
+</html>

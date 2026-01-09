@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assessment Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            padding: 4px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-blue { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .icon-pink { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .icon-orange { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .icon-green { background: linear-gradient(135deg, #30cfd0, #330867); }
+        .icon-purple { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .icon-red { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+            font-weight: 500;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group input:hover,
+        .input-group select:hover {
+            border-color: #b0b0b0;
+        }
+
+        .input-group.error input,
+        .input-group.error select {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .error-message {
+            display: none;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #fff5f5;
+            border-left: 3px solid #ff6b6b;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #ff6b6b;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .input-group.error .error-message {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            animation: slideDown 0.5s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Health Assessment</h1>
+            <p>Complete your health check-up form</p>
+        </div>
+
+        <form id="healthForm">
+            <div class="input-grid">
+                <div class="input-group" data-field="age">
+                    <label>
+                        <span class="icon icon-blue">👤</span>
+                        Age
+                    </label>
+                    <input type="number" name="age" min="1" max="120" placeholder="Enter your age">
+                    <div class="error-message">Age must be between 1 and 120</div>
+                </div>
+
+                <div class="input-group" data-field="gender">
+                    <label>
+                        <span class="icon icon-pink">⚧</span>
+                        Gender
+                    </label>
+                    <select name="gender">
+                        <option value="">Select gender</option>
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                    </select>
+                    <div class="error-message">Please select your gender</div>
+                </div>
+
+                <div class="input-group" data-field="fever">
+                    <label>
+                        <span class="icon icon-orange">🌡️</span>
+                        Fever
+                    </label>
+                    <select name="fever">
+                        <option value="">Do you have fever?</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                    <div class="error-message">Please select fever status</div>
+                </div>
+
+                <div class="input-group" data-field="bp">
+                    <label>
+                        <span class="icon icon-red">❤️</span>
+                        Blood Pressure (Systolic)
+                    </label>
+                    <input type="number" name="bp" min="80" max="200" placeholder="e.g., 120">
+                    <div class="error-message">BP must be between 80 and 200</div>
+                </div>
+
+                <div class="input-group" data-field="sugar">
+                    <label>
+                        <span class="icon icon-green">🍬</span>
+                        Sugar (mg/dL)
+                    </label>
+                    <input type="number" name="sugar" min="50" max="300" placeholder="e.g., 100">
+                    <div class="error-message">Sugar must be between 50 and 300</div>
+                </div>
+
+                <div class="input-group" data-field="oxygen">
+                    <label>
+                        <span class="icon icon-purple">💨</span>
+                        Oxygen (%)
+                    </label>
+                    <input type="number" name="oxygen" min="70" max="100" placeholder="e.g., 98">
+                    <div class="error-message">Oxygen must be between 70 and 100</div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Assessment</button>
+            
+            <div class="success-message" id="successMessage">
+                ✅ Form submitted successfully! Data saved.
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('healthForm');
+        const successMessage = document.getElementById('successMessage');
+
+        const validationRules = {
+            age: { min: 1, max: 120, message: 'Age must be between 1 and 120' },
+            gender: { required: true, message: 'Please select your gender' },
+            fever: { required: true, message: 'Please select fever status' },
+            bp: { min: 80, max: 200, message: 'BP must be between 80 and 200' },
+            sugar: { min: 50, max: 300, message: 'Sugar must be between 50 and 300' },
+            oxygen: { min: 70, max: 100, message: 'Oxygen must be between 70 and 100' }
+        };
+
+        function validateField(field, value) {
+            const rules = validationRules[field];
+            
+            if (rules.required && !value) {
+                return rules.message;
+            }
+            
+            if (rules.min !== undefined || rules.max !== undefined) {
+                const numValue = parseFloat(value);
+                if (!value || isNaN(numValue)) {
+                    return rules.message;
+                }
+                if (numValue < rules.min || numValue > rules.max) {
+                    return rules.message;
+                }
+            }
+            
+            return null;
+        }
+
+        function showError(fieldName, message) {
+            const inputGroup = document.querySelector(`[data-field="${fieldName}"]`);
+            inputGroup.classList.add('error');
+            const errorDiv = inputGroup.querySelector('.error-message');
+            if (message) {
+                errorDiv.textContent = message;
+            }
+        }
+
+        function clearError(fieldName) {
+            const inputGroup = document.querySelector(`[data-field="${fieldName}"]`);
+            inputGroup.classList.remove('error');
+        }
+
+        // Real-time validation
+        form.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('blur', function() {
+                const error = validateField(this.name, this.value);
+                if (error) {
+                    showError(this.name, error);
+                } else {
+                    clearError(this.name);
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    clearError(this.name);
+                }
+            });
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            const formData = new FormData(form);
+            
+            // Clear all previous errors
+            Object.keys(validationRules).forEach(field => {
+                clearError(field);
+            });
+
+            // Validate all fields
+            Object.keys(validationRules).forEach(field => {
+                const value = formData.get(field);
+                const error = validateField(field, value);
+                
+                if (error) {
+                    showError(field, error);
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                // Show success message
+                successMessage.classList.add('show');
+                
+                // Log form data (in real app, send to server)
+                console.log('Form Data:', Object.fromEntries(formData));
+                
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    form.reset();
+                    successMessage.classList.remove('show');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

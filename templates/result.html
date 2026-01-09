@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HealthPulse - Result</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+        }
+
+        body{
+            background:linear-gradient(135deg,#e0f7fa 0%,#80deea 100%);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
+
+        .card{
+            background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(14px);
+            padding:38px;
+            border-radius:28px;
+            max-width:460px;
+            width:100%;
+            box-shadow:0 14px 40px rgba(0,0,0,0.14);
+            animation:fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(30px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+
+        h2{
+            color:#00695c;
+            text-align:center;
+            margin-bottom:8px;
+        }
+
+        .sub{
+            text-align:center;
+            font-size:0.9rem;
+            color:#607d8b;
+            margin-bottom:20px;
+        }
+
+        .input-box{
+            background:#f1f8f7;
+            padding:16px;
+            border-radius:14px;
+            font-size:0.9rem;
+            color:#37474f;
+            margin-bottom:18px;
+        }
+
+        .risk{
+            font-size:1.8rem;
+            font-weight:900;
+            margin:18px 0;
+            text-align:center;
+        }
+
+        .low{color:#2e7d32;}
+        .medium{color:#f9a825;}
+        .high{color:#c62828;}
+
+        .advice-box{
+            background:#f5fafa;
+            border-left:5px solid #00bfa5;
+            padding:15px;
+            border-radius:14px;
+            color:#455a64;
+            font-size:0.95rem;
+            margin-top:10px;
+        }
+
+        .confidence{
+            margin-top:18px;
+            font-size:0.85rem;
+            color:#555;
+        }
+
+        .progress{
+            background:#e0f2f1;
+            height:8px;
+            border-radius:10px;
+            overflow:hidden;
+            margin-top:6px;
+        }
+
+        .bar{
+            height:100%;
+            background:#00bfa5;
+            width:0%;
+        }
+
+        .btn{
+            display:block;
+            margin:30px auto 0;
+            padding:15px 28px;
+            background:#00bfa5;
+            color:white;
+            text-decoration:none;
+            border-radius:16px;
+            font-weight:700;
+            text-align:center;
+            transition:0.25s;
+        }
+
+        .btn:hover{
+            background:#00897b;
+            transform:translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>🩺 Health Risk Analysis</h2>
+    <div class="sub">Saved result from database</div>
+
+    <!-- 🔹 USER INPUT (FROM health_records TABLE) -->
+    <div class="input-box">
+        <strong>🧾 Your Health Data</strong><br><br>
+        Age: {{ db_data.age }} years<br>
+        Gender: {{ db_data.gender }}<br>
+        Fever: {{ db_data.fever }}<br>
+        Blood Pressure: {{ db_data.bp }} mmHg<br>
+        Sugar: {{ db_data.sugar }} mg/dL<br>
+        Oxygen Level: {{ db_data.oxygen }} %
+    </div>
+
+    <!-- 🔹 RESULT (FROM results TABLE) -->
+    <div class="risk {{ db_data.risk_class }}">
+        {{ db_data.result }}
+    </div>
+
+    <div class="advice-box">
+        <strong>Doctor’s Note:</strong><br>
+        {% if db_data.risk_class == 'low' %}
+            You seem healthy. Maintain a balanced diet and regular exercise.
+        {% elif db_data.risk_class == 'medium' %}
+            Monitor your health closely and improve lifestyle habits.
+        {% else %}
+            Consult a doctor immediately. Medical attention is advised.
+        {% endif %}
+    </div>
+
+    <!-- 🔹 CONFIDENCE -->
+    <div class="confidence">
+        Prediction Confidence: <strong>{{ db_data.confidence }}%</strong>
+        <div class="progress">
+            <div class="bar" data-width="{{ db_data.confidence }}"></div>
+        </div>
+    </div>
+
+    <a href="/" class="btn">Check Again</a>
+</div>
+
+<script>
+    const bar = document.querySelector(".bar");
+    bar.style.width = bar.getAttribute("data-width") + "%";
+</script>
+
+</body>
+</html>
