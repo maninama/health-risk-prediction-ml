@@ -17,55 +17,57 @@ MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
 with open(MODEL_PATH, "rb") as file:
     model = pickle.load(file)
 
-
 # ---------- Home ----------
 @app.route("/")
 def home():
     return render_template("form.html")
 
+# ---------- SUBMIT ROUTE (ALIAS) ----------
+@app.route("/submit", methods=["POST"])
+def submit():
+    return predict()
 
 # ---------- Predict + Save ----------
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    # ---- 1. Read form data ----
-    age = int(request.form["age"])
-    gender = int(request.form["gender"])
-    fever = int(request.form["fever"])
-    bp = int(request.form["bp"])
-    sugar = int(request.form["sugar"])
-    oxygen = int(request.form["oxygen"])
-
-    print("Form data received:", age, gender, fever, bp, sugar, oxygen)
-
-    # ---- 2. ML Prediction ----
-    input_data = pd.DataFrame([{
-        "age": age,
-        "gender": gender,
-        "fever": fever,
-        "bp": bp,
-        "sugar": sugar,
-        "oxygen": oxygen
-    }])
-
-    prediction = int(model.predict(input_data)[0])
-    confidence = float(round(max(model.predict_proba(input_data)[0]) * 100, 2))
-
-    print("Prediction:", prediction)
-    print("Confidence:", confidence)
-
-    # ---- 3. Result mapping ----
-    risk_map = {0: "Low Risk", 1: "Medium Risk", 2: "High Risk"}
-    risk_class_map = {0: "low", 1: "medium", 2: "high"}
-
-    # ---- 4. SAVE TO DATABASE (ATOMIC TRANSACTION) ----
-    print("---- DB TRANSACTION START ----")
-
     try:
+        # ---- 1. Read form data ----
+        age = int(request.form["age"])
+        gender = int(request.form["gender"])
+        fever = int(request.form["fever"])
+        bp = int(request.form["bp"])
+        sugar = int(request.form["sugar"])
+        oxygen = int(request.form["oxygen"])
+
+        print("Form data received:", age, gender, fever, bp, sugar, oxygen)
+
+        # ---- 2. ML Prediction ----
+        input_data = pd.DataFrame([{
+            "age": age,
+            "gender": gender,
+            "fever": fever,
+            "bp": bp,
+            "sugar": sugar,
+            "oxygen": oxygen
+        }])
+
+        prediction = int(model.predict(input_data)[0])
+        confidence = float(round(max(model.predict_proba(input_data)[0]) * 100, 2))
+
+        print("Prediction:", prediction)
+        print("Confidence:", confidence)
+
+        risk_map = {0: "Low Risk", 1: "Medium Risk", 2: "High Risk"}
+        risk_class_map = {0: "low", 1: "medium", 2: "high"}
+
+        # ---- 3. DB TRANSACTION ----
+        print("---- DB TRANSACTION START ----")
+
         conn = get_connection()
         cursor = conn.cursor()
 
-        # 4A. Insert into health_records
+        # Insert health data
         cursor.execute("""
             INSERT INTO health_records
             (age, gender, fever, bp, sugar, oxygen)
@@ -78,7 +80,7 @@ def predict():
         if record_id is None:
             raise Exception("record_id is None")
 
-        # 4B. Insert into results
+        # Insert prediction result
         cursor.execute("""
             INSERT INTO results
             (record_id, predicted_risk, confidence)
@@ -86,34 +88,37 @@ def predict():
         """, (record_id, prediction, confidence))
 
         conn.commit()
-        print("Result saved in results table")
+        print("DB Commit Successful")
 
-        # 4C. Fetch joined data
+        # Fetch joined record
         cursor.execute("""
             SELECT h.age, h.gender, h.fever, h.bp, h.sugar, h.oxygen,
                    r.predicted_risk, r.confidence
             FROM health_records h
             JOIN results r ON h.id = r.record_id
             WHERE r.record_id = %s
-            ORDER BY r.id DESC
             LIMIT 1
         """, (record_id,))
 
         row = cursor.fetchone()
 
     except Exception as e:
-        conn.rollback()
-        print("DB TRANSACTION FAILED:", type(e).__name__, e)
-        return "Database error occurred."
+        if "conn" in locals():
+            conn.rollback()
+        print("DB ERROR:", type(e).__name__, e)
+        return "Database error occurred", 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if "cursor" in locals():
+            cursor.close()
+        if "conn" in locals():
+            conn.close()
 
     print("---- DB TRANSACTION END ----")
 
-    # ---- 5. SAVE TO CSV ----
+    # ---- 4. OPTIONAL CSV SAVE (LOCAL ONLY) ----
     try:
+        os.makedirs("dataset", exist_ok=True)
         file_exists = os.path.isfile(CSV_PATH)
 
         with open(CSV_PATH, mode="a", newline="") as file:
@@ -130,14 +135,13 @@ def predict():
                 bp, sugar, oxygen, prediction
             ])
 
-        print("Data saved to CSV")
+        print("CSV saved")
 
     except Exception as e:
         print("CSV ERROR:", e)
 
-    # ---- 6. Prepare DB data for UI ----
     if row is None:
-        return "No data found in database."
+        return "No data found", 500
 
     db_data = {
         "age": row[0],
@@ -151,13 +155,8 @@ def predict():
         "confidence": row[7]
     }
 
-    # ---- 7. Result page ----
-    return render_template(
-    "result.html",
-    db_data=db_data
-)
+    return render_template("result.html", db_data=db_data)
 
-
-
+# ---------- Run ----------
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run()
